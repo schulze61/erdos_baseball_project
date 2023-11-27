@@ -70,20 +70,45 @@ For completeness, we note that we have 538's Elo data stored in the csv files in
 ### Pythagorean Model <a name = "pythagorean"></a>
 We remark that this section is the main focus as it is the model that we created. As described in the introduction, our model is based off of the Pythagorean expectation. We shall denote the Pythagorean expectation of a team at game $n$ by 
 $PE_n$. For a given team, we make the assumption that the change of the Pythagorean expectation is not too large, that is there will be two constants $\epsilon_1$ and $\epsilon_2$ such that 
-$$\vert PE_{n+1}-PE_n\vert\leq \frac{1}{n^{\epsilon}}.$$
+$$\vert PE_{n+1}-PE_n\vert\leq \frac{\epsilon_1}{n^{\epsilon_2}}.$$
 Equivalently, we will have that 
 $$\ln\left(\left\vert PE_{n+1}-PE_n\right\vert\right)\leq -\epsilon\ln(n)$$
+The purpose of these quantities of $\epsilon_1$ and $\epsilon_2$ is that when we run our simulations of games, we don't expect 
+for the Pythagorean expectation to change too much after a given game, and it is more variable to change at the beginning of 
+the season (i.e. when $n$ is small) than later in the season. Thus, when we simulate a game between two teams we will discard 
+any simulations where the change in Pythagorean expectation exceeds this tolerated error.
 
-We deduced this as follows. We focused on a single team in a single season, and plotted the change in Pythagorean expectation over the games in the season. From which, we got the following plot which appeared to be a logarithmic graph. 
+One of our main goals was to discover which values of $\epsilon_1$ and $\epsilon_2$ will optimize our model. We had two methods 
+to solve for these values we did a regression, and we made a heat map. We outline both methods below; however, we remark that in the final model, we used the heat map and ran our model for the extreme values on the heat map to finalize these values. 
+
+#### Regression
+
+For our regression, we chose a single team and plotted the change of the Pythagorean expectation of that team over the games of a 
+single season. After doing this for a single team, we were curious if each team would have roughly the same shape, so we overlayed graphs for each teams change of Pythagorean expectation over the number of games in the season and got the following graph:
 
 <p align="center">
   <img src="https://github.com/schulze61/erdos_baseball_project/blob/main/Change%20in%20PE%20by%20Game%20Numer.png" />
 </p>
 
-Thus, after getting this graph, we did a regression to determine what value of $\epsilon$ we should choose for our tolerance of how much we will allow the Pythagorean expectation to change between each game.
+We noticed that this graph tends to be well approximated by $\frac{\epsilon_1}{n^{\epsilon_2}}$, and each team had roughly the same
+shape, so we decided to just choose a fixed $\epsilon_1\approx$ and $\epsilon_2\approx 1.4237$ for all simulations. Our first goal to determine these 
+values was to run a linear regression. This gave us some preliminary values, but we wanted to optimize these values with respect 
+to the Brier score (see section [Comparison of Models](#comparison)). This led us to create a heat map for different values of $\epsilon_1$ and $\epsilon_2$ showing the different Brier scores.
 
-After our regression, we then ran our simulation in the following way FINISH WRITING
+#### Heat Map
+We thus created the following heat map where the axes correspond to the choices of $\epsilon_1$ and $\epsilon_2$, and the heat 
+measures the Brier score for running a smaller simulation with these values of $\epsilon_1$ and $\epsilon_2$. We noticed that there 
+appeared to be a line where below this line the Brier score tended to be below $.25$ which is the goal.
 
+
+As there appeared to be this boundary where the Brier score was lower, we decided to run a full simulation for the extreme values of  
+$\epsilon_1$ and $\epsilon_2$ and different simulation methods to determine what will be the optimal choices. We also noted that there appeared to be small patches that appeared to be better in this region; however, we chose to disregard this as we created this heat map using smaller simulations. From this, we determined that the optimal value where $\epsilon_1 = $ and $\epsilon_2 = $. 
+
+We will now go into our different methods of simulation and which we took to be the most optimal. 
+
+### Methods of Simulation
+
+Now
 
 ### Elo model <a name = "elo"></a>
 
