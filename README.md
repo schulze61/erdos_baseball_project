@@ -29,15 +29,14 @@ be precisely the Pythagorean expectation. Thus, we decided that since the Pythag
 of the win percentage, then we may assume that the runs scored and runs allowed of each team follows that of a Weibull
 distribution (whose parameters are determined by the average number of runs scored and runs allowed). 
 This is the key idea behind our first predicitive model which shall be explained in further detail below 
-(see [Pythagorean Modeal](#pythagorean)). 
+(see section [Pythagorean Modeal](#pythagorean)). 
 
 As for a comparison of our model, we saw that 538 has an [ELO model](https://github.com/fivethirtyeight/data/tree/master/mlb-elo)
 which at each point in the season gives each team an ELO rating. We decided that this would be a good model to compare our Pythagorean
-model to. We also thought that there might be some additional factors that we might consider to enhance the 538 model such as the 
-pitcher or home field advantage (see [ELO Model](#elo)).
+model to. We note that 538 gave two separate different probabilities of winning based on both the ELO score and additional factors (see section [ELO Model](#elo)).
 
-After creating our Pythagorean model and the different ELO based models that we consider from 538, we then compare them using the 
-Brier score which is a metric that measures how well the prediction of an event is to the actuality of that said event (see [Comparions of Models](#comparison)).
+After creating our Pythagorean model and the different ELO based models that we consider from 538, we compare them using the 
+Brier score which is a metric that measures how well the prediction of an event is to the actuality of that said event (see section [Comparions of Models](#comparison)).
 
 ## Data gathering <a name = "data-gathering"></a>
 ### Data Sources
@@ -72,10 +71,28 @@ For completeness, we note that we have 538's ELO data stored in the csv files in
 
 ### ELO model <a name = "elo"></a>
 
+We note that for the ELO model, we just gathered the data from 538, and for each game 
+538 gave two separate probabilities for the team to win. The first probability takes 
+only into account the ELO scores of both teams to give a probability of a team 
+winning. We call this the "Elo model". 
+
+The second model that 538 gives is a probability that takes into account both the Elo
+scores of both teams, but it also takes into account the starting pitchers of both 
+teams to give an adjusted score. This model we call that "538 Rating". 
+
+When observing these models, we had made the observation that most of the 
+probabilities were around 50%, so a coin flip might as well be how we predict a winner,
+but we decided that the home team might have a slight edge on average. Thus, we decided
+to make a naive model as well were we always predict that the home team will win with
+a probability of $p=.5568$. We call this the "Home Advantage Model". Although, we did
+not expect this to be a good model, we discovered that it was a bit useful to see in 
+which years the home field advantage had more of an impact. 
+
 ## Comparison of Models <a name = "comparison"></a>
 
 ### Brier Score
-The metric which we decided to use to measure the effectiveness of each of the models will be the Brier score. This score is defined by the following formula
+The metric which we decided to use to measure the effectiveness of each of the models
+will be the Brier score. This score is defined by the following formula
 $$\text{Brier Score} = \frac{1}{N}\sum_{i=1}^N(p_i-o_i)^2$$
 where $p_i$ is the the probability that we have predicted for a team to win in game $i$ and $o_i$ is the outcome of game $i$ (i.e. $1$ if it is a win and $0$ if it is a loss). The main observation about the Brier scored which we must note is that a low Brier score is better (we see this if a team is $p_i=1$ and $o_i=1$, then we predicted with 100% accuracy that we would win and we were correct, and this contributes $0$ to the sum decreasing the score. On the other hand if $p_i=1$ and $o_i=0$, then we predicted with certainty a win, but a loss occured, so we were wrong, and this would contribute $1$ to the sum increasing the score). 
 
