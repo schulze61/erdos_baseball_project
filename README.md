@@ -87,22 +87,24 @@ For our regression, we chose a single team and plotted the change of the Pythago
 single season. After doing this for a single team, we were curious if each team would have roughly the same shape, so we overlayed graphs for each teams change of Pythagorean expectation over the number of games in the season and got the following graph:
 
 <p align="center">
-  <img src="https://github.com/schulze61/erdos_baseball_project/blob/main/Change%20in%20PE%20by%20Game%20Numer.png" />
+  <img src="https://github.com/schulze61/erdos_baseball_project/blob/main/Change%20in%20PE%20for%20all%20teams%20by%20Game%20Number.png" />
 </p>
 
 We noticed that this graph tends to be well approximated by $\frac{\epsilon_1}{n^{\epsilon_2}}$, and each team had roughly the same
-shape, so we decided to just choose a fixed $\epsilon_1\approx$ and $\epsilon_2\approx 1.4237$ for all simulations. Our first goal to determine these 
+shape, so we decided to just choose a fixed $\epsilon_1\approx 1$ and $\epsilon_2\approx 1.4237$ for all simulations. Our first goal to determine these 
 values was to run a linear regression. This gave us some preliminary values, but we wanted to optimize these values with respect 
 to the Brier score (see section [Comparison of Models](#comparison)). This led us to create a heat map for different values of $\epsilon_1$ and $\epsilon_2$ showing the different Brier scores.
 
 #### Heat Map
 We thus created the following heat map where the axes correspond to the choices of $\epsilon_1$ and $\epsilon_2$, and the heat 
 measures the Brier score for running a smaller simulation with these values of $\epsilon_1$ and $\epsilon_2$. We noticed that there 
-appeared to be a line where below this line the Brier score tended to be below $.25$ which is the goal.
+appeared to be a line where below this line the Brier score tended to be below $.25$ which is the goal. Furthermore, the black dot corresponds to our initial choice of $\epsilon_1$ and $\epsilon_2$ from the regression. We had this was a Brier score of around $.27$, but we saw that reducing these parameters should decrease our Brier score.
 
+<p align="center">
+  <img src="https://github.com/schulze61/erdos_baseball_project/blob/main/Heat%20Map%20for%20Epsilon.png" />
+</p>
 
-As there appeared to be this boundary where the Brier score was lower, we decided to run a full simulation for the extreme values of  
-$\epsilon_1$ and $\epsilon_2$ and different simulation methods to determine what will be the optimal choices. We also noted that there appeared to be small patches that appeared to be better in this region; however, we chose to disregard this as we created this heat map using smaller simulations. From this, we determined that the optimal value where $\epsilon_1 = $ and $\epsilon_2 = $. 
+As there appeared to be this boundary where the Brier score was lower, we decided to run a full simulation for the extreme values of  $\epsilon_1$ and $\epsilon_2$ and different simulation methods to determine what will be the optimal choices. We also noted that there appeared to be small patches that appeared to be better in this region; however, we chose to disregard this as we created this heat map using smaller simulations. From this, we determined that the optimal value where $\epsilon_1 = 1$ and $\epsilon_2 = $. 
 
 We will now go into our different methods of simulation and which we took to be the most optimal. 
 
