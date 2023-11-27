@@ -17,7 +17,7 @@ def data_read(year_now):
     reads data of the given year
     """
     
-    path = '.\Data\gl' + str(year_now) + '_new_sorted.csv'
+    path = './game_log_sorter/new_sorted_game_logs/gl' + str(year_now) + '_new_sorted.csv'
     data = pd.read_csv(path, header=0, index_col=0)
 
     return data
@@ -336,7 +336,8 @@ def season_sim(season_data, scale_bayes, n_sim, eps1, eps2, shape, pe_method, si
     """
     simulates the entire season
     """
-    
+    sim_g_array = np.zeros(len(season_data.index))
+    rej_array = np.zeros(len(season_data.index))
     for game_ind in range(len(season_data.index)): 
         # 1) identify teams in this game and find their stats at the end of their last game
         team_1 = stat_finder(season_data, game_ind, eps1, eps2, shape, pe_method, 1)
@@ -344,8 +345,10 @@ def season_sim(season_data, scale_bayes, n_sim, eps1, eps2, shape, pe_method, si
 
         # 2) simulation
         sim_g, rej = simulation_weibull(n_sim, team_1, team_2, scale_bayes, shape, opp_param, pe_method, sim_method)
+        sim_g_array[game_ind] = sim_g[sim_g["res(team_1)"]==1]["prob"].sum()
+        rej_array[game_ind] = rej
 
-    return sim_g, rej
+    return sim_g_array, rej_array
 
 
 #====================================================simulation_weibull============================================
