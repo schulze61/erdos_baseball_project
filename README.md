@@ -4,7 +4,12 @@
 1. [Project Overview](#overview)
 2. [Data Gathering](#data-gathering)
 3. [Our Models](#models)
-     1. [Pythagorean Model](#pythagorean)
+     1. [Pythagorean Models](#pythagorean) 
+
+        1. [Basic Model](#basic)
+        2. [Bayes Model](#bayes)
+        3. [Opponent Model](#opp)
+        4. [Both Model](#both)
      2. [Elo Model](#elo)
 4. [Comparison of Models](#comparison)
 
@@ -67,7 +72,7 @@ For completeness, we note that we have 538's Elo data stored in the csv files in
 
 ## Our Models <a name = "models"></a>
 
-### Pythagorean Model <a name = "pythagorean"></a>
+### Pythagorean Models <a name = "pythagorean"></a>
 We remark that this section is the main focus as it is the model that we created. As described in the introduction, our model is based off of the Pythagorean expectation. We shall denote the Pythagorean expectation of a team at game $n$ by 
 $PE_n$. For a given team, we make the assumption that the change of the Pythagorean expectation is not too large, that is there will be two constants $\epsilon_1$ and $\epsilon_2$ such that 
 $$\vert PE_{n+1}-PE_n\vert\leq \frac{\epsilon_1}{n^{\epsilon_2}}.$$
@@ -101,7 +106,7 @@ measures the Brier score for running a smaller simulation with these values of $
 appeared to be a line where below this line the Brier score tended to be below $.25$ which is the goal. Furthermore, the black dot corresponds to our initial choice of $\epsilon_1$ and $\epsilon_2$ from the regression. We had this was a Brier score of around $.27$, but we saw that reducing these parameters should decrease our Brier score.
 
 <p align="center">
-  <img src="https://github.com/schulze61/erdos_baseball_project/blob/main/Heat%20Map%20for%20Epsilon.png" />
+  <img src="https://github.com/schulze61/erdos_baseball_project/blob/main/Heat%20Map%20for%20Epsilon.png" style="background-color:white;"/>
 </p>
 
 As there appeared to be this boundary where the Brier score was lower, we decided to run a full simulation for the extreme values of  $\epsilon_1$ and $\epsilon_2$ and different simulation methods to determine what will be the optimal choices. We also noted that there appeared to be small patches that appeared to be better in this region; however, we chose to disregard this as we created this heat map using smaller simulations. From this, we determined that the optimal value where $\epsilon_1 = 1$ and $\epsilon_2 = $. 
@@ -110,7 +115,19 @@ We will now go into our different methods of simulation and which we took to be 
 
 ### Methods of Simulation
 
-Now
+We now explain the four different ways that we used the Pythagorean expectation to simulate games. We call them Basic, Bayes, Opponent, and Both. The Basic model will be the more naive thing, the Bayes model will add by incorporating some Bayesian techniques, the opponent model compares the opponent's defense to the offense, and lastly, the Both model combines the Bayes and Opponent models. We detail these models below. Note: to see the code that defines these simulations see [pemod.py](https://github.com/schulze61/erdos_baseball_project/blob/main/pemod.py).
+
+#### Basic Method <a name = "basic"></a>
+
+
+#### Bayes Model <a name = "bayes"></a>
+
+
+#### Opponent Model <a name = "opp"></a>
+
+
+#### Both Model  <a name = "both"></a>
+
 
 ### Elo model <a name = "elo"></a>
 
