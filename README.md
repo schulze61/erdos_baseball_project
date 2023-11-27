@@ -70,9 +70,20 @@ For completeness, we note that we have 538's Elo data stored in the csv files in
 ### Pythagorean Model <a name = "pythagorean"></a>
 We remark that this section is the main focus as it is the model that we created. As described in the introduction, our model is based off of the Pythagorean expectation. We shall denote the Pythagorean expectation of a team at game $n$ by 
 $PE_n$. For a given team, we make the assumption that the change of the Pythagorean expectation is not too large, that is there will be two constants $\epsilon_1$ and $\epsilon_2$ such that 
-$$\vert PE_{n+1}-PE_n\vert\leq \frac{\epsilon_1}{n^{\epsilon_2}}.$$
+$$\vert PE_{n+1}-PE_n\vert\leq \frac{1}{n^{\epsilon}}.$$
 Equivalently, we will have that 
-$$\ln\left(\left\vert PE_{n+1}-PE_n\right\vert\right)\leq \ln(\epsilon_1)-\epsilon_2\ln(n)$$
+$$\ln\left(\left\vert PE_{n+1}-PE_n\right\vert\right)\leq -\epsilon\ln(n)$$
+
+We deduced this as follows. We focused on a single team in a single season, and plotted the change in Pythagorean expectation over the games in the season. From which, we got the following plot which appeared to be a logarithmic graph. 
+
+<p align="center">
+  <img src="https://github.com/schulze61/erdos_baseball_project/blob/main/Change%20in%20PE%20by%20Game%20Numer.png" />
+</p>
+
+Thus, after getting this graph, we did a regression to determine what value of $\epsilon$ we should choose for our tolerance of how much we will allow the Pythagorean expectation to change between each game.
+
+After our regression, we then ran our simulation in the following way FINISH WRITING
+
 
 ### Elo model <a name = "elo"></a>
 
