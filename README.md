@@ -3,10 +3,10 @@
 ### Table of Contents
 1. [Project Overview](#overview)
 2. [Data Gathering](#data-gathering)
-3. [Our Two Models](#models)
+3. [Our Models](#models)
      1. [Pythagorean Model](#pythagorean)
      2. [ELO Model](#elo)
-4. [Comparisons with Existing Models](#comparison)
+4. [Comparisons of Models](#comparison)
 
 ## Project Overview <a name = "overview"></a>
 
@@ -37,7 +37,7 @@ model to. We also thought that there might be some additional factors that we mi
 pitcher or home field advantage (see [ELO Model](#elo)).
 
 After creating our Pythagorean model and the different ELO based models that we consider from 538, we then compare them using the 
-Brier score which is a metric that measures how well the prediction of an event is to the actuality of that said event (see [Comparions with Existing Models](#comparison)).
+Brier score which is a metric that measures how well the prediction of an event is to the actuality of that said event (see [Comparions of Models](#comparison)).
 
 ## Data gathering <a name = "data-gathering"></a>
 ### Data Sources
@@ -75,6 +75,9 @@ For completeness, we note that we have 538's ELO data stored in the csv files in
 ## Comparison of Models <a name = "comparison"></a>
 
 ### Brier Score
-The metric which we decided to use to measure the affectiveness of each of the models will be 
+The metric which we decided to use to measure the effectiveness of each of the models will be the Brier score. This score is defined by the following formula
+$$\text{Brier Score} = \frac{1}{N}\sum_{i=1}^N(p_i-o_i)^2$$
+where $p_i$ is the the probability that we have predicted for a team to win in game $i$ and $o_i$ is the outcome of game $i$ (i.e. $1$ if it is a win and $0$ if it is a loss). The main observation about the Brier scored which we must note is that a low Brier score is better (we see this if a team is $p_i=1$ and $o_i=1$, then we predicted with 100% accuracy that we would win and we were correct, and this contributes $0$ to the sum decreasing the score. On the other hand if $p_i=1$ and $o_i=0$, then we predicted with certainty a win, but a loss occured, so we were wrong, and this would contribute $1$ to the sum increasing the score). 
 
+We compared the Brier scores of our Pythagorean model and the different ELO models, and we plotted them against the years to see how the models compare. We insert the graph below for the reader. 
 
