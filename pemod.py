@@ -17,7 +17,7 @@ def data_read(year_now):
     reads data of the given year
     """
     
-    path = './game_log_sorter/new_sorted_game_logs/gl' + str(year_now) + '_new_sorted.csv'
+    path = '.\Data\gl' + str(year_now) + '_new_sorted.csv'
     data = pd.read_csv(path, header=0, index_col=0)
 
     return data
@@ -336,8 +336,7 @@ def season_sim(season_data, scale_bayes, n_sim, eps1, eps2, shape, pe_method, si
     """
     simulates the entire season
     """
-    sim_g_array = np.zeros(len(season_data.index))
-    rej_array = np.zeros(len(season_data.index))
+    
     for game_ind in range(len(season_data.index)): 
         # 1) identify teams in this game and find their stats at the end of their last game
         team_1 = stat_finder(season_data, game_ind, eps1, eps2, shape, pe_method, 1)
@@ -345,10 +344,8 @@ def season_sim(season_data, scale_bayes, n_sim, eps1, eps2, shape, pe_method, si
 
         # 2) simulation
         sim_g, rej = simulation_weibull(n_sim, team_1, team_2, scale_bayes, shape, opp_param, pe_method, sim_method)
-        sim_g_array[game_ind] = sim_g[sim_g["res(team_1)"]==1]["prob"].sum()
-        rej_array[game_ind] = rej
 
-    return sim_g_array, rej_array
+    return sim_g, rej
 
 
 #====================================================simulation_weibull============================================
@@ -381,13 +378,13 @@ def simulation_weibull(n_sim, team_1, team_2, scale_bayes, shape, opp_param, pe_
         
         if (team_2["past_ra"]/team_2["game_n"]) < team_1_scale :
             
-            team_1_scale = opp_param * team_1_scale + opp_param * (team_2["past_ra"]/team_2["game_n"])
+            team_1_scale = opp_param * team_1_scale + (1.0 - opp_param) * (team_2["past_ra"]/team_2["game_n"])
            # team_1_scale = opp_param * team_1_scale
         
         
         if (team_1["past_ra"]/team_1["game_n"]) < team_2_scale:
             
-            team_2_scale = opp_param * team_2_scale + opp_param * (team_1["past_ra"]/team_1["game_n"])
+            team_2_scale = opp_param * team_2_scale + (1.0 - opp_param) * (team_1["past_ra"]/team_1["game_n"])
           # team_2_scale = opp_param * team_2_scale
         
     elif sim_method == "both" :
@@ -395,15 +392,17 @@ def simulation_weibull(n_sim, team_1, team_2, scale_bayes, shape, opp_param, pe_
         team_1_scale = scale_bayes.loc[team_1["game_n"]-1, team_1["team"]]
         team_2_scale = scale_bayes.loc[team_2["game_n"]-1, team_2["team"]]
         
-        if (team_2["past_ra"]/team_2["game_n"]) < team_1["scale"] :
-            
-            team_1_scale = ((team_1_scale*shape_factor + (team_2["past_ra"]/team_2["game_n"]))/2.0) * (1.0/shape_factor)
-           # team_1_scale = opp_param * team_1_scale
+        if (team_2["past_ra"]/team_2["game_n"]) * (1.0/shape_factor) < team_1_scale:
+             
+            opp_comp     = (team_2["past_ra"]/team_2["game_n"]) * (1.0/shape_factor)
+            team_1_scale = opp_param * team_1_scale + (1.0 - opp_param) * opp_comp
+           # team_1_scale = opp_param * 
         
         
-        if (team_1["past_ra"]/team_1["game_n"]) < team_2["scale"]:
+        if (team_1["past_ra"]/team_1["game_n"]) * (1.0/shape_factor) < team_1_scale:
             
-            team_2_scale = ((team_2_scale*shape_factor + (team_1["past_ra"]/team_1["game_n"]))/2.0) * (1.0/shape_factor)
+            opp_comp     = (team_1["past_ra"]/team_1["game_n"]) * (1.0/shape_factor)
+            team_2_scale = opp_param * team_2_scale + (1.0 - opp_param) * opp_comp
           # team_2_scale = opp_param * team_2_scale
          
 
