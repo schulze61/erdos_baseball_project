@@ -11,7 +11,7 @@
         3. [Opponent Model](#opp)
         4. [Both Model](#both)
      2. [Elo Model](#elo)
-4. [Comparison of Models](#comparison)
+
 
 ## Project Overview <a name = "overview"></a>
 
@@ -33,12 +33,20 @@ and the runs allowed for a given team follow that of a Weibull distribution, the
 be precisely the Pythagorean expectation. Thus, we decided that since the Pythagorean expectation is a good approximation
 of the win percentage, then we may assume that the runs scored and runs allowed of each team follows that of a Weibull
 distribution (whose parameters are determined by the average number of runs scored and runs allowed). 
-This is the key idea behind our first predicitive model which shall be explained in further detail below 
+This is the key idea behind our first predictive model which shall be explained in further detail below 
 (see section [Pythagorean Modeal](#pythagorean)). 
 
 As for a comparison of our model, we saw that 538 has an [Elo model](https://github.com/fivethirtyeight/data/tree/master/mlb-elo)
 which at each point in the season gives each team an Elo rating. We decided that this would be a good model to compare our Pythagorean
 model to. We note that 538 gave two separate probabilities of winning based on both the Elo score and additional factors (see section [Elo Model](#elo)).
+
+### Brier Score
+
+The metric that we decided to use to measure the effectiveness of each of the models
+will be the Brier score. This score is defined by the following formula
+$$\text{Brier Score} = \frac{1}{N}\sum_{i=1}^N(p_i-o_i)^2$$
+where $p_i$ is the probability that we have predicted for a team to win in game $i$ and $o_i$ is the outcome of game $i$ (i.e. $1$ if it is a win and $0$ if it is a loss). The main observation about the Brier score which we must note is that a low Brier score is better (we see this if a team is $p_i=1$ and $o_i=1$, then we predicted with 100% accuracy that we would win and we were correct, and this contributes $0$ to the sum decreasing the score. On the other hand if $p_i=1$ and $o_i=0$, then we predicted with certainty a win, but a loss occured, so we were wrong, and this would contribute $1$ to the sum increasing the score). 
+
 
 After creating our Pythagorean model and the different Elo based models that we consider from 538, we compare them using the 
 Brier score which is a metric that measures how well the prediction of an event is to the actuality of that said event (see section [Comparion of Models](#comparison)).
@@ -109,7 +117,7 @@ appeared to be a line where below this line the Brier score tended to be below $
   <img src="https://github.com/schulze61/erdos_baseball_project/blob/main/Heat%20Map%20for%20Epsilon.png" style="background-color:white;"/>
 </p>
 
-As there appeared to be this boundary where the Brier score was lower, we decided to run a full simulation for the extreme values of  $\epsilon_1$ and $\epsilon_2$ and different simulation methods to determine what will be the optimal choices. We also noted that there appeared to be small patches that appeared to be better in this region; however, we chose to disregard this as we created this heat map using smaller simulations. From this, we determined that the optimal value where $\epsilon_1 = 1$ and $\epsilon_2 = $. 
+As there appeared to be this boundary where the Brier score was lower, we decided to run a full simulation for the extreme values of  $\epsilon_1$ and $\epsilon_2$ and different simulation methods to determine what will be the optimal choices. We also noted that there appeared to be small patches that appeared to be better in this region; however, we chose to disregard this as we created this heat map using smaller simulations. From many simulations, we found that there was not a significant change in the Brier score for different choices of $\epsilon_1$ and $\epsilon_2$ under the line. Thus, we settled upon the choice that $\epsilon_1=1.5$ and $\epsilon_2 = .5$. 
 
 We will now go into our different methods of simulation and which we took to be the most optimal. 
 
@@ -119,15 +127,89 @@ We now explain the four different ways that we used the Pythagorean expectation 
 
 #### Basic Method <a name = "basic"></a>
 
+For the basic model, we had made the assumption that the runs scored and runs allowed follow a Weibull distribution whose parameter can be determined by the average number of runs scored and allowed for each team. After calculating the parameters for these distributions for each team for each game, we then simulate these distributions to estimate the runs scored. In doing this, we count how many of our simulations each team wins and use that to give a probability that said team will win that game. This is the method of simulation for these four models; however, the different models will have different methods to determine the parameters of the Weibull distributions. 
+
 
 #### Bayes Model <a name = "bayes"></a>
 
+We assume that runs scored by each team are both random variables that follow a Weibull distribution. We follow the scientific research in the field to determine the shape parameter of the underlying Weibull distribution. Having fixed that parameter, in the first simulation, we assume that the scale paramater of the underlying Weibull distribution for each team is equal to the average runs that they have scored through their last game. In the second simulation, we use an alternative approach where this scale parameter for each team is determined through a continuous `Bayesian` updating process. The general idea is that we form a `prior` belief about the expected runs that a team can score at the beginning of the season. Then, as the season progresses, by observing the number of runs that they score in each game, we `update` our belief about their future peroformance. This updated belief, is then, used for simulation and prediction of their next game.
+
+We rely on statistical theory to form this Bayeisan updating algorithm. The theory tells us that if a random variable $x$ has a Weibull distribution with a *known* shape, then, an `Inverse Gamma (IG)` distribution would be a `conjugate` prior distribution for its scale parameter. In other words, consider the following Weibull random variable
+
+$$ f(x|k, \theta) = \frac{k}{\theta} x^{k-1} e^{-\frac{x^k}{\theta}}$$
+
+where $k$ is the **known** shape and $\\theta$ is the **unknown** scale parameter. If we assume the the scale parameter $\\theta$, is a random variable with an IG distribution with parameters *a* and *b*, we can formulate the problem in such a way that after each observation only the parameters of the IG distribution are updated. In this framework, let's assume that we start with a prior distribution with parameters $a_0$ and $b_0$ ($k$ is the known shape parameter), i.e. 
+
+$$\\theta|k \\sim IG(a_0, b_0) $$
+
+Then, if we observe $n$ games where the team in each game scores $rs_i \\hspace{2mm}$ runs for $i \\in \\{1,2, \\ldots, n\\}$, then, we can form our updated `posterior` belief as
+
+$$\\theta|k \\sim IG(a_n, b_n) $$
+
+where
+
+$$a_n = a_0 + n $$
+
+and 
+
+$$ b_n = b_0 + \\sum\\limits_{i=1}^{n} rs_i^{k}$$
+
+This is the algorithm we have followed in our simulation. The only issue is in the implementation of the algorithm as in Python the Weibull distribution is defined with a slightly different notation. Specifically, in Python a Weibull random variable has the following PDF:
+
+$$f(x|k,\\lambda) = \\frac{k}{\\lambda} (\\frac{x}{\\lambda})^{(k-1)} e^{-(\\frac{x}{\\lambda})^k}$$
+
+We should note that the two notations are identical iff $\\theta = \\lambda^k$. Using this relation, we formulate our Bayesian updating algorithm. 
+
+
+
+The above discussion completes the algorithm provided that we have a known **prior** i.e., $a_0$ and $b_0$*. In order to form our prior we make two assumptions. The first, is a standard assumption, $ a_0 = 2$. Note that, in the first notation,
+
+$$\\theta|k \\sim IG(a_0, b_0) \\hspace{3mm} \\Rightarrow \\hspace{3mm} \\mathbb{E}[\theta] = \\frac{b_0}{a_0-1} $$
+
+This normalizing assumption basically implies that $\mathbb{E}[\theta] = b_0$.
+
+In order to determine $b_0$, then, we can rely on the observed data. The initial values of the hyperparameter are defined such that before the first game, all teams are expected to score `rs_0` runs in their first game. This is an *uninformed prior*. Since the runs scored have a Weibull distribution:
+
+$$\\mathbb{E}[\text{runs}] = \\lambda \\Gamma(1+1/k)  \\hspace{3mm} \\Rightarrow \\hspace{3mm} \\lambda_0 = \\frac{rs_0}{\\Gamma(1+1/k)}$$
+
+Thus,
+
+$$\\mathbb{E}[\lambda_0^k] = \\frac{b}{a-1}  \\hspace{3mm} \\Rightarrow \\hspace{3mm}\\Big[\\frac{rs_0}{\\Gamma(1+1/k)} \\Big]^k = \\frac{b}{2-1}$$
+
+This gives us the initial hyperparameters for all teams :
+
+$$ b_0 = \\Big[\\frac{rs_0}{\\Gamma(1+1/k)} \\Big]^k  \\hspace{10mm} \text{and } \\hspace{10mm} a_0 = 2.0$$
+
+After one game, if a team scores $rs_1$ rusn. Then, we update our belief about their expected future runs as the following: 
+
+$$ \\lambda^k \\sim IG(a_0 +1, b_0 + rs_1^{k})$$
+
+Considering that,
+
+$$\\mathbb{E}[\lambda^k] = \\frac{ b_0 + rs_1^{k}}{a_0 +1 -1} $$
+
+we have:
+
+$$\\lambda_1 = \\Big[\\frac{ b_0 + rs_1^{k}}{a_0 +1 -1} \\Big]^{\\frac{1}{k}}$$
+
+This is the scale parameter that we use in our simulation. Similarly, after n games:
+
+$$\\lambda_n = \left[\frac{ b_0 + \sum\limits_{i=1}^{n} rs_i^{k}}{a_0 + n -1}\right]^{\\frac{1}{k}}$$
+
+This is how we do our Bayesian updating for the scale parameter for the Bayes model. 
 
 #### Opponent Model <a name = "opp"></a>
+
+For the Opponent Model, we take into account the defense of the opposing team in the following manner. We see if the average number of runs scored is larger than the average number of runs allowed for the opposing team, we might expect the offense to do better, so we increase the scale parameter in this case. 
 
 
 #### Both Model  <a name = "both"></a>
 
+For the Both Model, we first use our Bayesian updating method to get the parameters, and then we will do our comparison of the offense against the defense of each team, and make the adjustments as in the Opponent Model before we run the simulation. 
+
+#### Comparison of These Models
+
+Below we have a graph comparing the Brier scores of each of the four above models over the years 2010-2022. We remark that the spike in the year 2020 is likely due to the season being cut short due to Covid since we expect our model to be more accurate the for the further along in the season that we are. 
 
 ### Elo model <a name = "elo"></a>
 
@@ -139,22 +221,3 @@ winning. We call this the "Elo model".
 The second model that 538 gives is a probability that takes into account both the Elo
 scores of both teams, but it also takes into account the starting pitchers of both 
 teams to give an adjusted score. This model we call that "538 Rating". 
-
-When observing these models, we had made the observation that most of the 
-probabilities were around 50%, so a coin flip might as well be how we predict a winner,
-but we decided that the home team might have a slight edge on average. Thus, we decided
-to make a naive model as well where we always predict that the home team will win with
-a probability of $p=.5568$. We call this the "Home Advantage Model". Although we did
-not expect this to be a good model, we discovered that it was a bit useful to see in 
-which years the home-field advantage had more of an impact. 
-
-## Comparison of Models <a name = "comparison"></a>
-
-### Brier Score
-The metric that we decided to use to measure the effectiveness of each of the models
-will be the Brier score. This score is defined by the following formula
-$$\text{Brier Score} = \frac{1}{N}\sum_{i=1}^N(p_i-o_i)^2$$
-where $p_i$ is the probability that we have predicted for a team to win in game $i$ and $o_i$ is the outcome of game $i$ (i.e. $1$ if it is a win and $0$ if it is a loss). The main observation about the Brier score which we must note is that a low Brier score is better (we see this if a team is $p_i=1$ and $o_i=1$, then we predicted with 100% accuracy that we would win and we were correct, and this contributes $0$ to the sum decreasing the score. On the other hand if $p_i=1$ and $o_i=0$, then we predicted with certainty a win, but a loss occured, so we were wrong, and this would contribute $1$ to the sum increasing the score). 
-
-We compared the Brier scores of our Pythagorean model and the different Elo models, and we plotted them against the years to see how the models compare. We insert the graph below for the reader. 
-
