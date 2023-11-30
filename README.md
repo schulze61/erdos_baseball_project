@@ -47,7 +47,7 @@ After our simulation model, we also did a logistic regression model where we mod
 The metric that we decided to use to measure the effectiveness of each of the models
 will be the Brier score. This score is defined by the following formula
 $$\text{Brier Score} = \frac{1}{N}\sum_{i=1}^N(p_i-o_i)^2$$
-where $p_i$ is the probability that we have predicted for a team to win in game $i$ and $o_i$ is the outcome of game $i$ (i.e. $1$ if it is a win and $0$ if it is a loss). The main observation about the Brier score which we must note is that a low Brier score is better (we see this if a team is $p_i=1$ and $o_i=1$, then we predicted with 100% accuracy that we would win and we were correct, and this contributes $0$ to the sum decreasing the score. On the other hand if $p_i=1$ and $o_i=0$, then we predicted with certainty a win, but a loss occured, so we were wrong, and this would contribute $1$ to the sum increasing the score). 
+where $p_i$ is the probability that we have predicted for a team to win in game $i$ and $o_i$ is the outcome of game $i$ (i.e. $1$ if it is a win and $0$ if it is a loss). The main observation about the Brier score which we must note is that a low Brier score is better (we see this if a team is $p_i=1$ and $o_i=1$, then we predicted with 100% accuracy that we would win and we were correct, and this contributes $0$ to the sum decreasing the score. On the other hand if $p_i=1$ and $o_i=0$, then we predicted with certainty a win, but a loss occurred, so we were wrong, and this would contribute $1$ to the sum increasing the score). 
 
 ## Data gathering <a name = "data-gathering"></a>
 ### Data Sources
@@ -58,7 +58,7 @@ this data for comparison purposes to compare our model to their model.
 ### Preprocessing Data
 
 The data from retrosheet was given in a txt file. Furthermore, their data consisted of a multitude of 
-variables that we were not interested in for our Pythagorean model such as individual players statistics,
+variables that we were not interested in for our Pythagorean model such as individual player's statistics,
 umpire statistics, weather, etc. Thus, we took only the required statistics from retrosheet, and created a
 csv file where we also added the additional statistics of their win percentage and Pythagorean expectation. 
 (see [Sort_game_logs_v2.ipynb](https://github.com/schulze61/erdos_baseball_project/blob/main/game_log_sorter/Sort_game_logs_v2.ipynb))
@@ -68,7 +68,7 @@ This initial data cleaning with the csv files we have stored in the [sorted_game
 After doing some preliminary work on our model, we did some additional data cleaning since the retrosheet
 data as is had each game listed twice (one time for each team playing). Thus, to avoid redundancy, we cut 
 the data in half so each game only appeared once, but this was at the cost of creating additional columns
-and distinuguishing between a Team_1 and a Team_2. Furthermore, at this step we also added additional 
+and distinguishing between a Team_1 and a Team_2. Furthermore, at this step we also added additional 
 data into the csv file that would be useful in the perspective of modeling the runs scored and runs allowed
 in terms of the Weibull distribution. Thus, we added the cumulative and average runs scored and allowed for 
 each team prior to the given game, so we have how they did before the given game (see [Resort_Data_v3.ipynb](https://github.com/schulze61/erdos_baseball_project/blob/main/game_log_sorter/Resort_Data_v3.ipynb)). The
@@ -107,7 +107,7 @@ to solve for these values we did a regression, and we made a heat map. We outlin
 #### Regression
 
 For our regression, we chose a single team and plotted the change of the Pythagorean expectation of that team over the games of a 
-single season. After doing this for a single team, we were curious if each team would have roughly the same shape, so we overlayed graphs for each teams change of Pythagorean expectation over the number of games in the season and got the following graph: (this was done in [Part2-V2.ipynb](https://github.com/schulze61/erdos_baseball_project/blob/main/Part2-V2.ipynb)).
+single season. After doing this for a single team, we were curious if each team would have roughly the same shape, so we overlayed graphs for each team's change of Pythagorean expectation over the number of games in the season and got the following graph: (this was done in [Part2-V2.ipynb](https://github.com/schulze61/erdos_baseball_project/blob/main/Part2-V2.ipynb)).
 
 <p align="center">
   <img src="https://github.com/schulze61/erdos_baseball_project/blob/main/images/Change%20in%20PE%20for%20all%20teams%20by%20Game%20Number.png" />
@@ -142,9 +142,9 @@ For the basic model, we had made the assumption that the runs scored and runs al
 
 #### Bayes Model <a name = "bayes"></a>
 
-We assume that runs scored by each team are both random variables that follow a Weibull distribution. We follow the scientific research in the field to determine the shape parameter of the underlying Weibull distribution. Having fixed that parameter, in the first simulation, we assume that the scale paramater of the underlying Weibull distribution for each team is equal to the average runs that they have scored through their last game. In the second simulation, we use an alternative approach where this scale parameter for each team is determined through a continuous `Bayesian` updating process. The general idea is that we form a `prior` belief about the expected runs that a team can score at the beginning of the season. Then, as the season progresses, by observing the number of runs that they score in each game, we `update` our belief about their future peroformance. This updated belief, is then, used for simulation and prediction of their next game.
+We assume that runs scored by each team are both random variables that follow a Weibull distribution. We follow the scientific research in the field to determine the shape parameter of the underlying Weibull distribution. Having fixed that parameter, in the first simulation, we assume that the scale parameter of the underlying Weibull distribution for each team is equal to the average runs that they have scored through their last game. In the second simulation, we use an alternative approach where this scale parameter for each team is determined through a continuous `Bayesian` updating process. The general idea is that we form a `prior` belief about the expected runs that a team can score at the beginning of the season. Then, as the season progresses, by observing the number of runs that they score in each game, we `update` our belief about their future performance. This updated belief, is then, used for simulation and prediction of their next game.
 
-We rely on statistical theory to form this Bayeisan updating algorithm. The theory tells us that if a random variable $x$ has a Weibull distribution with a *known* shape, then, an `Inverse Gamma (IG)` distribution would be a `conjugate` prior distribution for its scale parameter. In other words, consider the following Weibull random variable
+We rely on statistical theory to form this Bayesian updating algorithm. The theory tells us that if a random variable $x$ has a Weibull distribution with a *known* shape, then, an `Inverse Gamma (IG)` distribution would be a `conjugate` prior distribution for its scale parameter. In other words, consider the following Weibull random variable
 
 $$ f(x|k, \theta) = \frac{k}{\theta} x^{k-1} e^{-\frac{x^k}{\theta}}$$
 
@@ -190,7 +190,7 @@ This gives us the initial hyperparameters for all teams :
 
 $$ b_0 = \\Big[\\frac{rs_0}{\\Gamma(1+1/k)} \\Big]^k  \\hspace{10mm} \text{and } \\hspace{10mm} a_0 = 2.0$$
 
-After one game, if a team scores $rs_1$ rusn. Then, we update our belief about their expected future runs as the following: 
+After one game, if a team scores $rs_1$ runs. Then, we update our belief about their expected future runs as the following: 
 
 $$ \\lambda^k \\sim IG(a_0 +1, b_0 + rs_1^{k})$$
 
@@ -237,14 +237,14 @@ We observe that the Basic and Bayes models seem to track alongside each other wh
 #### Comparison with 538 Model
 
 We looked at the Brier scores for the 538 models, and we have graphed them below compared to 
-our Opponent model as that was of our four models the one that preformed the best. We graph 
+our Opponent model as that was of our four models the one that performed the best. We graph 
 these all below.
 
 <p align="center">
   <img src="https://github.com/schulze61/erdos_baseball_project/blob/main/images/Brier%20Score%20Comparison%20of%20Model%20with%20538.png"/>
 </p>
 
-We then calculate the average Brier scores over the years for these models and record them in the following table, we observe that the 538 models appear to out perform our simulation model by about 2 standard deviations. Thus, we conclude that our simulation model does not improve upon the 538 model.
+We then calculate the average Brier scores over the years for these models and record them in the following table, we observe that the 538 models appears to out perform our simulation model by about 2 standard deviations. Thus, we conclude that our simulation model does not improve upon the 538 model.
 
 | Model | Mean  | Standard Deviation |
 |-------|-------|---------------------|
@@ -254,7 +254,7 @@ We then calculate the average Brier scores over the years for these models and r
 
 ### Regression model <a name = "regression_model"></a>
 
-As a second approach, we modelled the probabilities of victory for a team via a logistic regression on a single feature. The feature we analyze is simply the runs scored and allowed adjusted for opponent. This metric is given by
+As a second approach, we modeled the probabilities of victory for a team via a logistic regression on a single feature. The feature we analyze is simply the runs scored and allowed adjusted for opponnent. This metric is given by
 
 $$ RS_{adj} = \frac{1}{n}  \sum_{n } (RS_n/RA_{n,avg} -1) \quad RS_{adj} = \frac{1}{n}  \sum_{n games} (1 - RS_{n,avg}/RA_n) $$
 
@@ -273,6 +273,13 @@ where $RS_n, RA_n$ is the number of runs scored and allowed by the team in game 
 Here we can see that our Opponent Adjusted Efficiency model actually outperforms both the Pythagorean model and 538's Elo model. 
 
 We additionally kept the same simulation, but we focused on just the second half of the season and the last 10% of the season. We provide these graphs below:
+<p align="center">
+  <img src="https://github.com/schulze61/erdos_baseball_project/blob/main/images/Brier%20Score%20For%20Different%20Simulations%20Last%20Half.png"/>
+</p>
+
+<p align="center">
+  <img src="https://github.com/schulze61/erdos_baseball_project/blob/main/images/Brier%20Score%20For%20Different%20Simulations%20Last%2010%20Percent.png"/>
+</p>
 
 
 The observation that we see is even though the models performed differently, as we just go towards the end of the season each of these three models seems to converge. This suggests that the Pythagorean expectation method is likely only as good as our other models towards the end of the season while the other models seem to perform more consistently throughout the season. 
