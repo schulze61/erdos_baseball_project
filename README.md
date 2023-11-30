@@ -4,15 +4,14 @@
 1. [Project Overview](#overview)
 2. [Data Gathering](#data-gathering)
 3. [Our Models](#models)
-     1. [Pythagorean Models](#pythagorean) 
-
+     1. [Elo Model](#elo)
+     2. [Pythagorean Simulation Models](#pythagorean)
         1. [Basic Model](#basic)
         2. [Bayes Model](#bayes)
         3. [Opponent Model](#opp)
         4. [Both Model](#both)
-     2. [Regression Model](#regression_model)
-     3. [Elo Model](#elo)
-
+   3. [Regression Model](#regression_model)
+4. [Conclusion](#conclusion)
 
 ## Project Overview <a name = "overview"></a>
 
@@ -35,11 +34,13 @@ be precisely the Pythagorean expectation. Thus, we decided that since the Pythag
 of the win percentage, then we may assume that the runs scored and runs allowed of each team follows that of a Weibull
 distribution (whose parameters are determined by the average number of runs scored and runs allowed). 
 This is the key idea behind our first predictive model which shall be explained in further detail below 
-(see section [Pythagorean Modeal](#pythagorean)). 
+(see section [Pythagorean Simulation Model](#pythagorean)). 
 
 As for a comparison of our model, we saw that 538 has an [Elo model](https://github.com/fivethirtyeight/data/tree/master/mlb-elo)
 which at each point in the season gives each team an Elo rating. We decided that this would be a good model to compare our Pythagorean
 model to. We note that 538 gave two separate probabilities of winning based on both the Elo score and additional factors (see section [Elo Model](#elo)).
+
+After our simulation model, we also did a logistic regression model where we modeled the probability of victory for a team focusing on a single feature. We focused on the Pythagorean expectation as one such feature, but also created another statistic that we called the runs scored adjusted for the opponent (see section [Regression Model](#regression_model)).
 
 ### Brier Score
 
@@ -48,14 +49,10 @@ will be the Brier score. This score is defined by the following formula
 $$\text{Brier Score} = \frac{1}{N}\sum_{i=1}^N(p_i-o_i)^2$$
 where $p_i$ is the probability that we have predicted for a team to win in game $i$ and $o_i$ is the outcome of game $i$ (i.e. $1$ if it is a win and $0$ if it is a loss). The main observation about the Brier score which we must note is that a low Brier score is better (we see this if a team is $p_i=1$ and $o_i=1$, then we predicted with 100% accuracy that we would win and we were correct, and this contributes $0$ to the sum decreasing the score. On the other hand if $p_i=1$ and $o_i=0$, then we predicted with certainty a win, but a loss occured, so we were wrong, and this would contribute $1$ to the sum increasing the score). 
 
-
-After creating our Pythagorean model and the different Elo based models that we consider from 538, we compare them using the 
-Brier score which is a metric that measures how well the prediction of an event is to the actuality of that said event (see section [Comparion of Models](#comparison)).
-
 ## Data gathering <a name = "data-gathering"></a>
 ### Data Sources
 For our project, we used the data from [retrosheet](https://www.retrosheet.org/) specifically we 
-focused solely on the years from 2010-2022. As mentioned above, we found that 538 had an [Elo model](https://github.com/fivethirtyeight/data/tree/master/mlb-elo) which we also had copied, but we used
+focused solely on the years from 2010-2022 for the Pythagorean simulation, but we extended the years to 2000-2019 for the regression model. As mentioned above, we found that 538 had an [Elo model](https://github.com/fivethirtyeight/data/tree/master/mlb-elo) which we also had copied, but we used
 this data for comparison purposes to compare our model to their model. 
 
 ### Preprocessing Data
@@ -79,9 +76,21 @@ csv files for the second cleaning of the data are stored in the [new_sorted_game
 
 For completeness, we note that we have 538's Elo data stored in the csv files in the [mlb_elo_data](https://github.com/schulze61/erdos_baseball_project/tree/main/mlb_elo_data) folder. 
 
-## Our Models <a name = "models"></a>
+## Models <a name = "models"></a>
 
-### Pythagorean Models <a name = "pythagorean"></a>
+### Elo model <a name = "elo"></a>
+
+We note that for the Elo model, we just gathered the data from 538, and for each game 
+538 gave two separate probabilities for the team to win. The first probability takes 
+only into account the Elo scores of both teams to give a probability of a team 
+winning. We call this the "Elo model". 
+
+The second model that 538 gives is a probability that takes into account both the Elo
+scores of both teams, but it also takes into account the starting pitchers of both 
+teams to give an adjusted score. This model we call that "538 Rating". 
+
+
+### Pythagorean Simulation Models <a name = "pythagorean"></a>
 We remark that this section is the main focus as it is the model that we created. As described in the introduction, our model is based off of the Pythagorean expectation. We shall denote the Pythagorean expectation of a team at game $n$ by 
 $PE_n$. For a given team, we make the assumption that the change of the Pythagorean expectation is not too large, that is there will be two constants $\epsilon_1$ and $\epsilon_2$ such that 
 $$\vert PE_{n+1}-PE_n\vert\leq \frac{\epsilon_1}{n^{\epsilon_2}}.$$
@@ -98,16 +107,16 @@ to solve for these values we did a regression, and we made a heat map. We outlin
 #### Regression
 
 For our regression, we chose a single team and plotted the change of the Pythagorean expectation of that team over the games of a 
-single season. After doing this for a single team, we were curious if each team would have roughly the same shape, so we overlayed graphs for each teams change of Pythagorean expectation over the number of games in the season and got the following graph:
+single season. After doing this for a single team, we were curious if each team would have roughly the same shape, so we overlayed graphs for each teams change of Pythagorean expectation over the number of games in the season and got the following graph: (this was done in [Part2-V2.ipynb](https://github.com/schulze61/erdos_baseball_project/blob/main/Part2-V2.ipynb)).
 
 <p align="center">
-  <img src="https://github.com/schulze61/erdos_baseball_project/blob/main/Change%20in%20PE%20for%20all%20teams%20by%20Game%20Number.png" />
+  <img src="https://github.com/schulze61/erdos_baseball_project/blob/main/images/Change%20in%20PE%20for%20all%20teams%20by%20Game%20Number.png" />
 </p>
 
 We noticed that this graph tends to be well approximated by $\frac{\epsilon_1}{n^{\epsilon_2}}$, and each team had roughly the same
 shape, so we decided to just choose a fixed $\epsilon_1\approx 1$ and $\epsilon_2\approx 1.4237$ for all simulations. Our first goal to determine these 
 values was to run a linear regression. This gave us some preliminary values, but we wanted to optimize these values with respect 
-to the Brier score (see section [Comparison of Models](#comparison)). This led us to create a heat map for different values of $\epsilon_1$ and $\epsilon_2$ showing the different Brier scores.
+to the Brier score. This led us to create a heat map for different values of $\epsilon_1$ and $\epsilon_2$ showing the different Brier scores.
 
 #### Heat Map
 We thus created the following heat map where the axes correspond to the choices of $\epsilon_1$ and $\epsilon_2$, and the heat 
@@ -115,7 +124,7 @@ measures the Brier score for running a smaller simulation with these values of $
 appeared to be a line where below this line the Brier score tended to be below $.25$ which is the goal. Furthermore, the black dot corresponds to our initial choice of $\epsilon_1$ and $\epsilon_2$ from the regression. We had this was a Brier score of around $.27$, but we saw that reducing these parameters should decrease our Brier score.
 
 <p align="center">
-  <img src="https://github.com/schulze61/erdos_baseball_project/blob/main/Heat%20Map%20for%20Epsilon.png" style="background-color:white;"/>
+  <img src="https://github.com/schulze61/erdos_baseball_project/blob/main/images/Heat%20Map%20for%20Epsilon.png" />
 </p>
 
 As there appeared to be this boundary where the Brier score was lower, we decided to run a full simulation for the extreme values of  $\epsilon_1$ and $\epsilon_2$ and different simulation methods to determine what will be the optimal choices. We also noted that there appeared to be small patches that appeared to be better in this region; however, we chose to disregard this as we created this heat map using smaller simulations. From many simulations, we found that there was not a significant change in the Brier score for different choices of $\epsilon_1$ and $\epsilon_2$ under the line. Thus, we settled upon the choice that $\epsilon_1=1.5$ and $\epsilon_2 = .5$. 
@@ -210,10 +219,10 @@ For the Both Model, we first use our Bayesian updating method to get the paramet
 
 #### Comparison of These Models
 
-Below we have a graph comparing the Brier scores of each of the four above models over the years 2010-2022. We remark that the spike in the year 2020 is likely due to the season being cut short due to Covid since we expect our model to be more accurate for the further along in the season that we are. 
+Below we have a graph comparing the Brier scores of each of the four above models over the years 2010-2022. We remark that the spike in the year 2020 is likely due to the season being cut short due to Covid since we expect our model to be more accurate for the further along in the season that we are. (these graphs were calculated in [Pythagorean Simulations.ipynb](https://github.com/schulze61/erdos_baseball_project/blob/main/Pythagorean%20Simulations.ipynb))
 
 <p align="center">
-  <img src="https://github.com/schulze61/erdos_baseball_project/blob/main/Brier%20Scores%20for%20Different%20Simulation%20Types.png"/>
+  <img src="https://github.com/schulze61/erdos_baseball_project/blob/main/images/Brier%20Scores%20for%20Different%20Simulation%20Types.png"/>
 </p>
 
 We observe that the Basic and Bayes models seem to track alongside each other while the Opponent and Bayes models also seem to track alongside each other with the latter two out performing the former. What surprised us was that the Opponent model appeared to have a smaller average Brier Score and was a standard deviation lower than the Both model. Thus, our Opponent model is the most accurate. 
@@ -225,6 +234,24 @@ We observe that the Basic and Bayes models seem to track alongside each other wh
 | Opp   | .2503 | .0031               |
 | Both  | .2506 | .003                |
 
+#### Comparison with 538 Model
+
+We looked at the Brier scores for the 538 models, and we have graphed them below compared to 
+our Opponent model as that was of our four models the one that preformed the best. We graph 
+these all below.
+
+<p align="center">
+  <img src="https://github.com/schulze61/erdos_baseball_project/blob/main/images/Brier%20Score%20Comparison%20of%20Model%20with%20538.png"/>
+</p>
+
+We then calculate the average Brier scores over the years for these models and record them in the following table, we observe that the 538 models appear to out perform our simulation model by about 2 standard deviations. Thus, we conclude that our simulation model does not improve upon the 538 model.
+
+| Model | Mean  | Standard Deviation |
+|-------|-------|---------------------|
+| Opp   | .2503 | .0031               |
+| Elo   | .245  | .0028               |
+| 538   | .2435 | .0031               |
+
 ### Regression model <a name = "regression_model"></a>
 
 As a second approach, we modelled the probabilities of victory for a team via a logistic regression on a single feature. The feature we analyze is simply the runs scored and allowed adjusted for opponent. This metric is given by
@@ -234,7 +261,7 @@ $$ RS_{adj} = \frac{1}{n}  \sum_{n } (RS_n/RA_{n,avg} -1) \quad RS_{adj} = \frac
 where $RS_n, RA_n$ is the number of runs scored and allowed by the team in game $n$ and $RA_{n,avg}, RS_{n,avg}$ is the average number of runs allowed and scored by the team's opponent up until game $n$. We combine these statistics into a single feature for each team, $T = RS_{adj} + RA_{adj}$, and compute the probability of victory by a logistic regression fit to this feature on the previous season's data. We compare our results to a logistic regression model using the Pythagorean expectation as the feature and the 538 Elo model. 
 
 <p align="center">
-  <img src="https://github.com/schulze61/erdos_baseball_project/blob/main/full_season.png"/>
+  <img src="https://github.com/schulze61/erdos_baseball_project/blob/main/images/full_season.png"/>
 </p>
 
 | Model | Mean  | Standard Deviation |
@@ -245,17 +272,5 @@ where $RS_n, RA_n$ is the number of runs scored and allowed by the team in game 
 
 Here we can see that our Opponent Adjusted Efficiency model actually outperforms both the Pythagorean model and 538's Elo model. 
 
-### Elo model <a name = "elo"></a>
+## Conclusion <a name = "conclusion"></a>
 
-We note that for the Elo model, we just gathered the data from 538, and for each game 
-538 gave two separate probabilities for the team to win. The first probability takes 
-only into account the Elo scores of both teams to give a probability of a team 
-winning. We call this the "Elo model". 
-
-The second model that 538 gives is a probability that takes into account both the Elo
-scores of both teams, but it also takes into account the starting pitchers of both 
-teams to give an adjusted score. This model we call that "538 Rating". 
-
-We looked at the Brier scores for these models, and we have graphed them below compared to 
-our Opponent model as that was of our four models the one that preformed the best. We graph 
-these all below.
