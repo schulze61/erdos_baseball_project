@@ -258,7 +258,7 @@ As a second approach, we modelled the probabilities of victory for a team via a 
 
 $$ RS_{adj} = \frac{1}{n}  \sum_{n } (RS_n/RA_{n,avg} -1) \quad RS_{adj} = \frac{1}{n}  \sum_{n games} (1 - RS_{n,avg}/RA_n) $$
 
-where $RS_n, RA_n$ is the number of runs scored and allowed by the team in game $n$ and $RA_{n,avg}, RS_{n,avg}$ is the average number of runs allowed and scored by the team's opponent up until game $n$. We combine these statistics into a single feature for each team, $T = RS_{adj} + RA_{adj}$, and compute the probability of victory by a logistic regression fit to this feature on the previous season's data. We compare our results to a logistic regression model using the Pythagorean expectation as the feature and the 538 Elo model. 
+where $RS_n, RA_n$ is the number of runs scored and allowed by the team in game $n$ and $RA_{n,avg}, RS_{n,avg}$ is the average number of runs allowed and scored by the team's opponent up until game $n$. We combine these statistics into a single feature for each team, $T = RS_{adj} + RA_{adj}$, and compute the probability of victory by a logistic regression fit to this feature on the previous season's data. We compare our results to a logistic regression model using the Pythagorean expectation as the feature and the 538 Elo model (these calculations were performed in [erdos baseball accuracy and bscore estimates for three models.ipynb](https://github.com/schulze61/erdos_baseball_project/blob/main/erdos%20baseball%20accuracy%20and%20bscore%20estimates%20for%20three%20models.ipynb)).
 
 <p align="center">
   <img src="https://github.com/schulze61/erdos_baseball_project/blob/main/images/full_season.png"/>
@@ -272,5 +272,11 @@ where $RS_n, RA_n$ is the number of runs scored and allowed by the team in game 
 
 Here we can see that our Opponent Adjusted Efficiency model actually outperforms both the Pythagorean model and 538's Elo model. 
 
+We additionally kept the same simulation, but we focused on just the second half of the season and the last 10% of the season. We provide these graphs below:
+
+
+The observation that we see is even though the models performed differently, as we just go towards the end of the season each of these three models seems to converge. This suggests that the Pythagorean expectation method is likely only as good as our other models towards the end of the season while the other models seem to perform more consistently throughout the season. 
+
 ## Conclusion <a name = "conclusion"></a>
 
+From our data, we found that the Pythagorean simulation method was not an effective model compared to existing models. Furthermore, it only tended to perform as well as existing models towards the end of the season when we ran our regression model. However, our Opponent Adjusted Efficiency Model appeared to show a bit of improvement over the 538 model. 
