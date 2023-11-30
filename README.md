@@ -10,7 +10,8 @@
         2. [Bayes Model](#bayes)
         3. [Opponent Model](#opp)
         4. [Both Model](#both)
-     2. [Elo Model](#elo)
+     2. [Regression Model](#regression)
+     3. [Elo Model](#elo)
 
 
 ## Project Overview <a name = "overview"></a>
@@ -224,7 +225,13 @@ We observe that the Basic and Bayes models seem to track alongside each other wh
 | Opp   | .2503 | .0031               |
 | Both  | .2506 | .003                |
 
+### Regression model <a name = "regression"></a>
 
+As a second approach, we modelled the probabilities of victory for a team via a logistic regression on a single feature. The feature we analyze is simply the runs scored and allowed adjusted for opponent. This metric is given by
+
+$$ RS_{adj} = \frac{1}{n}  \sum_{n } (RS_n/RA_{n,avg} -1) \quad RS_{adj} = \frac{1}{n}  \sum_{n games} (1 - RS_{n,avg}/RA_n) $$
+
+where $RS_n, RA_n$ is the number of runs scored and allowed by the team in game $n$ and $RA_{n,avg}, RS_{n,avg}$ is the average number of runs allowed and scored by the team's opponent up until game $n$. We combine these statistics into a single feature for each team, $T = RS_{adj} + RA_{adj}$, and compute the probability of victory by a logistic regression fit to this feature on the previous season's data. We compare our results to a logistic regression model using the Pythagorean expectation as the feature and the 538 Elo model. 
 
 ### Elo model <a name = "elo"></a>
 
