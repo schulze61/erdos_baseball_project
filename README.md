@@ -209,7 +209,22 @@ For the Both Model, we first use our Bayesian updating method to get the paramet
 
 #### Comparison of These Models
 
-Below we have a graph comparing the Brier scores of each of the four above models over the years 2010-2022. We remark that the spike in the year 2020 is likely due to the season being cut short due to Covid since we expect our model to be more accurate the for the further along in the season that we are. 
+Below we have a graph comparing the Brier scores of each of the four above models over the years 2010-2022. We remark that the spike in the year 2020 is likely due to the season being cut short due to Covid since we expect our model to be more accurate for the further along in the season that we are. 
+
+<p align="center">
+  <img src="https://github.com/schulze61/erdos_baseball_project/blob/main/Brier%20Scores%20for%20Different%20Simulation%20Types.png"/>
+</p>
+
+We observe that the Basic and Bayes models seem to track alongside each other while the Opponent and Bayes models also seem to track alongside each other with the latter two out performing the former. What surprised us was that the Opponent model appeared to have a smaller average Brier Score and was a standard deviation lower than the Both model. Thus, our Opponent model is the most accurate. 
+
+| Model | Mean  | Standard Deviation |
+|-------|-------|---------------------|
+| Basic | .2551 | .0039               |
+| Bayes | .2543 | .0042               |
+| Opp   | .2503 | .0031               |
+| Both  | .2506 | .003                |
+
+
 
 ### Elo model <a name = "elo"></a>
 
@@ -221,3 +236,7 @@ winning. We call this the "Elo model".
 The second model that 538 gives is a probability that takes into account both the Elo
 scores of both teams, but it also takes into account the starting pitchers of both 
 teams to give an adjusted score. This model we call that "538 Rating". 
+
+We looked at the Brier scores for these models, and we have graphed them below compared to 
+our Opponent model as that was of our four models the one that preformed the best. We graph 
+these all below.
