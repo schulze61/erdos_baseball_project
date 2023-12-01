@@ -121,7 +121,7 @@ to the Brier score. This led us to create a heat map for different values of $\e
 #### Heat Map
 We thus created the following heat map where the axes correspond to the choices of $\epsilon_1$ and $\epsilon_2$, and the heat 
 measures the Brier score for running a smaller simulation with these values of $\epsilon_1$ and $\epsilon_2$. We noticed that there 
-appeared to be a line where below this line the Brier score tended to be below $.25$ which is the goal. Furthermore, the black dot corresponds to our initial choice of $\epsilon_1$ and $\epsilon_2$ from the regression. We had this was a Brier score of around $.27$, but we saw that reducing these parameters should decrease our Brier score.
+appeared to be a line where below this line the Brier score tended to be below $.25$ which is the goal. Furthermore, the black dot corresponds to our initial choice of $\epsilon_1$ and $\epsilon_2$ from the regression. We had this was a Brier score of around $.27$, but we saw that reducing these parameters should decrease our Brier score (the heat map was calculated in [heat_map_plotting.ipynb](https://github.com/schulze61/erdos_baseball_project/blob/main/heat_map_plotting.ipynb)).
 
 <p align="center">
   <img src="https://github.com/schulze61/erdos_baseball_project/blob/main/images/Heat%20Map%20for%20Epsilon.png" />
